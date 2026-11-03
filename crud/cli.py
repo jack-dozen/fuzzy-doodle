@@ -6,6 +6,7 @@ Contoh:
 """
 import argparse
 import csv
+import glob
 import sys
 from pathlib import Path
 
@@ -34,15 +35,25 @@ def main(argv=None) -> int:
     ap.add_argument("--ast", action="store_true", help="cetak AST (setelah resolusi), lalu keluar")
     args = ap.parse_args(argv)
 
+    files = []
+    for path in args.files:
+        if glob.has_magic(str(path)):
+            matches = sorted(Path(match) for match in glob.glob(str(path)))
+            if not matches:
+                ap.error(f"pola file tidak cocok dengan file apa pun: {path}")
+            files.extend(matches)
+        else:
+            files.append(path)
+
     if args.ast:
-        for path in args.files:
+        for path in files:
             print(f"===== {path} =====")
             _print_ast(path)
         return 0
 
     had_error = False
     results = {}
-    for path in args.files:
+    for path in files:
         res = analyze_source(path.read_text(encoding="utf-8"))
         results[path.name] = res
         if res.lex_error:
