@@ -15,3 +15,9 @@ def test_kombinasi_huruf_besar_dan_huruf_kecil():
     assert toks[0].type == T.KEYWORD and toks[0].value == "SELECT"
     assert toks[2].type == T.KEYWORD and toks[2].value == "FROM"
 #ini penting untuk membangun lexer yang case sensitive
+
+def test_dua_kutip_berturut_turut():
+    toks = tokenize("'O''Brian'")
+    assert toks[0].type == T.STRING and toks[0].value == "O"
+    assert toks[1].type == T.STRING and toks[1].value == "'"
+    assert toks[2].type == T.STRING and toks[2].value == "Brian"
