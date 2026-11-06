@@ -114,3 +114,24 @@ WHERE id IN (SELECT pelanggan_id FROM pesanan WHERE total > 1000000);
 **Peran AI.** AI secara tidak sengaja menemukan bug ketika saya meminta melakukan hal lainnya (saya minta AI memverifikasi file csv sudah sesuai atau belum untuk mendeteksi bug no 3) kemudian AI memberi tahu kalau dia menemukan bug dimana subquery dari UPDATE ditandai dengan "U" padahal seharusnya ditandai dengan "R".
 
 ---
+
+## Bug 5: OUTER ditengah LEFT dan JOIN
+
+**Ditemukan oleh:** AI . **Diperbaiki oleh:** Farrel
+
+**Gejala.** Input : Berupa syntax LEFT JOIN menggunakan OUTER diantara LEFT dan JOIN, Output : FAILED karena parser mengharapkan kata setelah LEFT adalah JOIN padahal ada OUTER , Output yang diharapkan : PASSED karena parser mengecek apakah ada kata OUTER setelah LEFT
+
+```sql
+SELECT a.id 
+FROM a 
+LEFT OUTER JOIN b 
+ON b.a_id = a.id
+```
+
+**Akar Permasalahan.** Kode lama salah karena pada saat kata LEFT ditemukan oleh **match_kw()**, tidak dilakukan pemeriksaan tambahan apakah ada kata OUTER dan langsung mengharapkan kata selanjutnya adalah JOIN sehingga terjadi parserror.
+
+**Perbaikan.** Setelah menemukan kata LEFT, dilakukan pengecekan kata selanjutnya ada OUTER atau tidak dengan menggunakan **match_kw()**. Jika tidak, maka akan mengembalikan none dan tidak akan menggeser pointer. Jika ada, maka akan mengembalikan OUTER dan memindahkan pointer.
+
+**Test regresi.** test_tambahan.py::test_left_join_dengan_outer.
+
+**Peran AI** AI membantu saya dalam membuat tes untuk menguji lexernya.
