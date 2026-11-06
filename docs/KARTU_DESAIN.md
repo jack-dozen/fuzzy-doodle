@@ -14,6 +14,6 @@ alternatif yang ditolak dan alasannya. Contoh topik (boleh memilih yang lain):
 | --- | --- | --- | --- |
 | 1 | error recovery berhenti safe-point seperti ketika ketemu semicolon (;) atau keyword pembuka statement (select,insert,update,delete) | safe-point hanya semicolon saja atau keyword pembuka statement saja | Hal ini karena sesuai dengan konsep panic mode recovery error pada crafting interpreters dimana semicolon dan keyword pembuka dijadikan safe-point sebagai penanda statement baru |
 | 2 | OR dan AND dibuatkan fungsi masing-masing dimana OR sebagai tingkat terendah akan menjadi root dan akan memanggil AND yang satu tingkat diatasnya, sedangkan AND akan memanggil NOT | - | Hal ini dilakukan karena AND bisa saja menjadi ROOT akibat kode membuat OR dan AND berada pada tingkat yang sama padahal OR sebagai tingkat terendah haruslah menjadi ROOT |
-| 3 | | | |
+| 3 | memanggil kembali fungsi _select() untuk select di dalam fungsi _insert() | menulis aturan parsing khusus SELECT di dalam INSERT | karena SELECT biasa dan SELECT di dalam INSERT memiliki aturan yang sama, sehingga tidak diperlukan menulis aturan khusus karena hanya akan menjadi kode duplikat (redundan) |
 | 4 | | | |
 | 5 | | | |
