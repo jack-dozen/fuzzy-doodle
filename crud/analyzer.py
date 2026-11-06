@@ -20,7 +20,7 @@ def analyze_statement(stmt) -> dict[str, set[str]]:
         usage[stmt.table.name].add("U")
         for assignment in stmt.assignments:
             _collect(assignment.value, usage, "U")
-        _collect(stmt.where, usage, "U")
+        _collect(stmt.where, usage, "R") # subquery dari update dianggap R(ead) bukan update
     elif isinstance(stmt, ast.Delete):
         usage[stmt.table.name].add("D")
         _collect(stmt.where, usage, "R")

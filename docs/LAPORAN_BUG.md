@@ -84,10 +84,33 @@ WHERE o.status = 'LUNAS' AND o.catatan <> 'FROM rahasia'
 
 **Akar masalah.** Dalam kode lama tidak diterapkan pengecekan jika karakter sesudah "<" adalah ">", yang dilakukan hanya pengecekan untuk "<=".
 
-**Perbaikan.** Perubahan dilakukan di file lexer.py di dalam fungsi _scan_token, tidak menemukan perbaikan alternatif.
+**Perbaikan.** Perubahan dilakukan di file lexer.py di dalam fungsi _scan_token karena bagian itu yang bertugas untuk 'memaknai' token, tidak menemukan perbaikan alternatif.
 
-**Test regresi.** test_operator_tidak_sama_dengan_sudut()
+**Test regresi.** test_tambahan::test_operator_tidak_sama_dengan_sudut.
 
 **Peran AI.** Membantu membuat test dalam test_tambahan.py dan memberi tahu file mana yang harus diubah.
+
+---
+
+## Bug 4: subquery dari UPDATE terdeteksi sebagai "U"
+
+**Ditemukan oleh:** AI · **Diperbaiki oleh:** Zaky
+
+**Gejala.** Input berupa script sql yang memiliki query UPDATE dan subquery SET atau WHERE, dalam SPESIFIKASI.md bagian 5 subquery dari UPDATE harus berupa R bukan U, sedangkan dari yang dihasilkan adalah U.
+
+**Reproduksi minimal.** SQL terpendek yang memicu bug:
+
+```sql
+UPDATE pelanggan SET level = 'gold'
+WHERE id IN (SELECT pelanggan_id FROM pesanan WHERE total > 1000000);
+```
+
+**Akar masalah.** Dalam kode lama subquery menghasilkan U, ini melanggar ketentuan di SPESIFIKASI.md bagian 5.
+
+**Perbaikan.** File yang diubah analyzer.py dalam fungsi analyze_statement,
+
+**Test regresi.** test_analyzer::test_matrix_laporan_penjualan.
+
+**Peran AI.** AI secara tidak sengaja menemukan bug ketika saya meminta melakukan hal lainnya (saya minta AI memverifikasi file csv sudah sesuai atau belum untuk mendeteksi bug no 3) kemudian AI memberi tahu kalau dia menemukan bug dimana subquery dari UPDATE ditandai dengan "U" padahal seharusnya ditandai dengan "R".
 
 ---
