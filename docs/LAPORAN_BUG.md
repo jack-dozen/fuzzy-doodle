@@ -122,9 +122,9 @@ WHERE id IN (SELECT pelanggan_id FROM pesanan WHERE total > 1000000);
 **Gejala.** Input : Berupa syntax LEFT JOIN menggunakan OUTER diantara LEFT dan JOIN, Output : FAILED karena parser mengharapkan kata setelah LEFT adalah JOIN padahal ada OUTER , Output yang diharapkan : PASSED karena parser mengecek apakah ada kata OUTER setelah LEFT
 
 ```sql
-SELECT a.id 
-FROM a 
-LEFT OUTER JOIN b 
+SELECT a.id
+FROM a
+LEFT OUTER JOIN b
 ON b.a_id = a.id
 ```
 
@@ -145,8 +145,8 @@ ON b.a_id = a.id
 **Gejala.** Input : Berupa Script SQL yang berisi penggunaan OR dan AND, Output : FAILED karena parser menganggap AND sebagai ROOT dari ASTnya, Output yang diharapkan : PASSED karena parser membuat OR sebagai ROOT dari ASTnya karena presedensi
 
 ```sql
-SELECT * 
-FROM t 
+SELECT *
+FROM t
 WHERE status = 'ACTIVE' OR gaji > 5000 AND umur >= 21;
 ```
 
@@ -157,3 +157,28 @@ WHERE status = 'ACTIVE' OR gaji > 5000 AND umur >= 21;
 **Test regresi.** test_tambahan.py::test_left_join_dengan_outer.
 
 **Peran AI** AI membantu saya dalam membuat tes untuk menguji parsernya.
+
+
+## Bug 6: alias shadowing dari dalam ke luar
+
+**Ditemukan oleh:** Farrel · **Diperbaiki oleh:** Zaky
+
+**Gejala.** Misal ada alias yang sama "x" seperti pada sql di bawah ini, seharusnya "x" di luar (merujuk ke pelanggan) di shadow terlebih dahulu oleh "x" di dalam (merujuk ke pesanan), namun malah sebaliknya. Menurut SPESIFIKASI.md scope harusnya di baca yang terdalam.
+
+**Reproduksi minimal.** SQL terpendek yang memicu bug:
+
+```sql
+SELECT x.id
+FROM pelanggan x
+WHERE x.id IN (SELECT x.pelanggan_id FROM pesanan x WHERE x.total > 500000);
+```
+
+**Akar masalah.** Dalam kode lama, dilakukan reverse pada scope, padahal _lookup mengumpulkan scope dari dalam ke luar, sehingga tidak perlu di reverse.
+
+**Perbaikan.** File resolver.py di dalam fungsi _lookup(), menghapus reverse(scope) menjadi scope saja.
+
+**Test regresi.** test_tambahan::test_alias_subquery_menutupi_alias_outer.
+
+**Peran AI.** AI membantu membuat test alias shadowing.
+
+---

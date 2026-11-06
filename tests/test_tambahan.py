@@ -4,6 +4,7 @@ from crud.lexer import LexError, TokenType as T, tokenize
 from crud import ast_nodes as ast
 from crud.parser import parse_sql
 from crud.ast_nodes import pretty
+from crud.resolver import Resolver
 
 """Test tambahan buatan kelompok.
 
@@ -66,7 +67,7 @@ def test_presedensi_and_or():
 
 def test_synchronize_panic_mode():
     sql = """
-    SELECT a FORM b; 
+    SELECT a FORM b;
     SELECT buah FROM produk
     """
 
@@ -76,3 +77,22 @@ def test_synchronize_panic_mode():
 
     assert len(script.statements) == 1
     assert script.statements[0].sources[0].name == "produk"
+
+#resolver
+def test_alias_subquery_menutupi_alias_outer():
+    sql = "SELECT p.id FROM pelanggan p WHERE p.id IN (SELECT p.id FROM pesanan p)"
+    script = parse_sql(sql)
+    assert script.errors == [], script.errors
+
+    diagnostics = Resolver().resolve_script(script)
+    column_refs = [
+        node for node in ast.iter_nodes(script)
+        if isinstance(node, ast.ColumnRef)
+    ]
+
+    assert [column.resolved for column in column_refs] == [
+        "pelanggan",
+        "pelanggan",
+        "pesanan",
+    ]
+    assert diagnostics == []
