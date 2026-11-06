@@ -87,10 +87,18 @@ class Parser:
                 self._synchronize()
         return ast.Script(statements, errors)
 
+    def _previous(self) -> Token:
+        return self.tokens[self.pos-1]
+
     def _synchronize(self) -> None:
         # Panic mode (Crafting Interpreters bab 6): buang token sampai
         # titik aman, lalu lanjutkan parsing.
+        self._advance()
         while not self._at_end():
+            if self._previous().type == T.SEMICOLON:
+                return
+            if self._check_kw("SELECT","INSERT","UPDATE","DELETE"):
+                return
             self._advance()
 
     def _statement(self):

@@ -63,3 +63,16 @@ def test_presedensi_and_or():
     assert where_expr.op == "OR"          # Root harus OR
     assert where_expr.left.op == "="      # Sisi kiri OR adalah status = 'ACTIVE'
     assert where_expr.right.op == "AND"   # Sisi kanan OR diikat oleh AND
+
+def test_synchronize_panic_mode():
+    sql = """
+    SELECT a FORM b; 
+    SELECT buah FROM produk
+    """
+
+    script = parse_sql(sql)
+
+    assert len(script.errors) == 1
+
+    assert len(script.statements) == 1
+    assert script.statements[0].sources[0].name == "produk"
