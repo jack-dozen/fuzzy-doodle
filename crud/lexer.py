@@ -130,8 +130,11 @@ class Lexer:
             self._add(TokenType.OP, ch, line, col)
             return
         if ch == "<":
-            op = "<=" if self._match("=") else "<"
-            self._add(TokenType.OP, op, line, col)
+            if self._match(">"): # cek kalau setelah "<" adalah ">" sebagai operator not_eq
+                self._add(TokenType.OP, "<>", line, col)
+            else:
+                op = "<=" if self._match("=") else "<"
+                self._add(TokenType.OP, op, line, col)
             return
         if ch == ">":
             op = ">=" if self._match("=") else ">"
