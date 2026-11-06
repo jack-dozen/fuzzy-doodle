@@ -3,6 +3,7 @@ import pytest
 from crud.lexer import LexError, TokenType as T, tokenize
 from crud import ast_nodes as ast
 from crud.parser import parse_sql
+from crud.ast_nodes import pretty
 
 """Test tambahan buatan kelompok.
 
@@ -43,3 +44,22 @@ def test_left_join_dengan_outer():
     s = one("SELECT a.id FROM a LEFT OUTER JOIN b ON b.a_id = a.id")
     assert s.joins[0].kind == "LEFT"
     assert s.joins[0].source.name == "b"
+
+def test_presedensi_and_or():
+    sql = "SELECT * FROM t WHERE status = 'ACTIVE' OR gaji > 5000 AND umur >= 21;"
+    script = parse_sql(sql)
+
+    #Menampilkan AST
+    print(pretty(script.statements[0].where))
+
+    # 1. Pastikan tidak ada error parsing
+    assert len(script.errors) == 0
+
+    # 2. Ambil node ekspresi WHERE
+    where_expr = script.statements[0].where
+
+    # 3. Uji hierarki AST
+    assert isinstance(where_expr, ast.BinaryOp)
+    assert where_expr.op == "OR"          # Root harus OR
+    assert where_expr.left.op == "="      # Sisi kiri OR adalah status = 'ACTIVE'
+    assert where_expr.right.op == "AND"   # Sisi kanan OR diikat oleh AND
