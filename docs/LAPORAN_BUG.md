@@ -135,3 +135,25 @@ ON b.a_id = a.id
 **Test regresi.** test_tambahan.py::test_left_join_dengan_outer.
 
 **Peran AI** AI membantu saya dalam membuat tes untuk menguji lexernya.
+
+---
+
+## Bug 5: Presedensi OR dan AND yang setara
+
+**Ditemukan oleh:** AI . **Diperbaiki oleh:** Farrel
+
+**Gejala.** Input : Berupa Script SQL yang berisi penggunaan OR dan AND, Output : FAILED karena parser menganggap AND sebagai ROOT dari ASTnya, Output yang diharapkan : PASSED karena parser membuat OR sebagai ROOT dari ASTnya karena presedensi
+
+```sql
+SELECT * 
+FROM t 
+WHERE status = 'ACTIVE' OR gaji > 5000 AND umur >= 21;
+```
+
+**Akar Permasalahan.** Kode lama salah karena parser mencampur tingkatan OR dan AND pada satu fungsi yaitu **_logical** sehingga hasil dari ASTnya AND sebagai root padahal seharusnya OR sebagai presedensi terendah adalah ROOTnya bukan AND yang berada satu tingkat lebih tinggi dari OR. ini melanggar konsep stratified grammar pada crafting interpreters, dimana setiap level presedensi sebaiknya dibuat aturan berbeda untuk tiap level. Penerapan pada parser ini adalah dengan membuat dua fungsi berbeda yaitu **or_expr** dan **and_expr**.
+
+**Perbaikan.** menghapus fungsi **logical()** dan memecahnya menjadi dua fungsi berbeda yaitu **or_expr** dan **and_expr**. fungsi **expr** diubah dari mengembalikan fungsi **logical()** menjadi mengembalikan **or_expr**.
+
+**Test regresi.** test_tambahan.py::test_left_join_dengan_outer.
+
+**Peran AI** AI membantu saya dalam membuat tes untuk menguji parsernya.
