@@ -35,7 +35,7 @@ memverifikasinya?
 
 **Ditemukan oleh:** Farrel . **Diperbaiki oleh:** Farrel
 
-**Gejala.** Input : "select" dan "from", Output : FAILED, Output yang diharapkan : Nilai token keyword selalu dinormalisasi ke huruf besar. 
+**Gejala.** Input : "select" dan "from", Output : FAILED, Output yang diharapkan : Nilai token keyword selalu dinormalisasi ke huruf besar.
 
 ```sql
 select id from t
@@ -55,7 +55,7 @@ select id from t
 
 **Ditemukan oleh:** Farrel . **Diperbaiki oleh:** Farrel
 
-**Gejala.** Input : 'O''Brian', Output : FAILED karena menghasilkan dua string yaitu O dan Brian , Output yang diharapkan : PASSED dan menghasilkan satu string O'Brian. 
+**Gejala.** Input : 'O''Brian', Output : FAILED karena menghasilkan dua string yaitu O dan Brian , Output yang diharapkan : PASSED dan menghasilkan satu string O'Brian.
 
 ```sql
 ```
@@ -67,5 +67,27 @@ select id from t
 **Test regresi.** test_lexer.py::test_dua_kutip_berturut_turut.
 
 **Peran AI** AI membantu saya dalam membuat tes untuk menguji lexernya.
+
+---
+
+## Bug 3: operator not equal (<>) tidak terdeteksi (terdeteksi sebagai operator more than)
+
+**Ditemukan oleh:** Zaky · **Diperbaiki oleh:** Zaky
+
+**Gejala.** Input berupa operator <> dengan harapan outputnya hasil perbandingan not equal bukan more than, sesuai dengan SPESIFIKASI.md bagian 2.5.
+
+**Reproduksi minimal.** SQL terpendek yang memicu bug:
+
+```sql
+WHERE o.status = 'LUNAS' AND o.catatan <> 'FROM rahasia'
+```
+
+**Akar masalah.** Dalam kode lama tidak diterapkan pengecekan jika karakter sesudah "<" adalah ">", yang dilakukan hanya pengecekan untuk "<=".
+
+**Perbaikan.** Perubahan dilakukan di file lexer.py di dalam fungsi _scan_token, tidak menemukan perbaikan alternatif.
+
+**Test regresi.** test_operator_tidak_sama_dengan_sudut()
+
+**Peran AI.** Membantu membuat test dalam test_tambahan.py dan memberi tahu file mana yang harus diubah.
 
 ---

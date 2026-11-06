@@ -19,3 +19,12 @@ def test_kombinasi_huruf_besar_dan_huruf_kecil():
 def test_dua_kutip_berturut_turut():
     toks = tokenize("'O''Brian'")
     assert toks[0].type == T.STRING and toks[0].value == "O'Brian"
+
+def test_operator_tidak_sama_dengan_sudut():
+    toks = tokenize("a <> b")
+    assert [(tok.type, tok.value) for tok in toks] == [
+        (T.IDENT, "a"),
+        (T.OP, "<>"),
+        (T.IDENT, "b"),
+        (T.EOF, ""),
+    ]
