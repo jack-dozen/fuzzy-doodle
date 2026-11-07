@@ -130,4 +130,6 @@ def test_analyzer_self_referencing_insert():
     matrix = analyze_statement(stmt)
 
     assert matrix["crm.pelanggan"] == {"C", "R"}
+#Query ini menyentuh satu tabel fisik (crm.pelanggan) dengan dua jenis operasi berbeda sekaligus (Create dari target INSERT dan Read dari sumber SELECT). 
+# Edge case ini membuktikan bahwa analyzer.py menggunakan set untuk menyimpan operasi (usage[table].add(...)) sehingga menghasilkan {"C", "R"}, alih-alih menimpa data operasi sebelumnya.
 
