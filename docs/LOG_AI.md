@@ -9,6 +9,7 @@ Catat setiap penggunaan AI atau coding agent yang memengaruhi kode atau laporan.
 | 3 | Farrel | buatkan test untuk mengeecek presedensi OR dan AND yang akan saya tambahkan ke test_tambahan.py | diterima | Karena berhasil mendeteksi bug pada sebuah script sql | Membandingkan hasil tes ketika kode yang belum di perbaiki dan sudah diperbaii |
 | 4 | Zaky | buatkan test alias shadowing untuk di tambah di test_tambahan | diterima | Karena konsisten dengan pengecekan manual | Dibandingkan dengan pengecekan manual dan hasil test yang digenerate AI konsisten |
 | 5 | Farrel | Jelaskan mengenai fungsi-fungsi buatan pada resolver.py dan pandu saya dalam mengerjakan TODO(T2) | diterima | Karena kode untuk TODO (T2) membuat hasil test_kolom_tanpa_qualifier_satu_tabel pada test_resolver dari FAIL menjadi PASS | membandingkan hasil test |
+| 6 | Farrel | Jelaskan mengenai bug synchronize pada resolver dan konsep apa yang berkaitan dengan bug ini berdasarkan buku? | diterima | Karena dapat menjelaskan bug ini dengan baik, konsep yang seharusnya diterapkan pada fungsi synchronize serta pembuatan test untuk menguji hasil perbaikan fungsi ini | membandingkan hasil test fungsi synchronize
 
 **Refleksi.** AI paling membantu kami dalam mencari bug dan membuat test untuk memastikan
 perbaikannya. Sejauh penggunaan kami, AI jarang memberikan hasil yang keliru karena spesifikasi

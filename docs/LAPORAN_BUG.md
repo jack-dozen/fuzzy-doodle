@@ -151,3 +151,22 @@ WHERE x.id IN (SELECT x.pelanggan_id FROM pesanan x WHERE x.total > 500000);
 **Peran AI.** AI membantu membuat test alias shadowing.
 
 ---
+
+## Bug 7: Synchronize membuang Syntax SQL yang belum tentu invalid
+
+**Ditemukan oleh:** Farrel . **Diperbaiki oleh:** Farrel
+
+**Gejala.** Input : sebuah Script SQL dengan keyword yang typo, Output : FAILED karena ada sebuah keyword yang typo dan syntax setelah keyword typo tersebut dibuang begitu saja dan melemparkan banyak error palsu, Output yang diharapkan : PASS karena Synchronize menemukan safe point untuk membuang token yang salah kemudian parser dapat lanjut membaca token.
+
+```sql
+SELECT a FORM b;
+SELECT buah FROM produk
+```
+
+**Akar Permasalahan.** Kode lama salah karena fungsi **syncronize** pada parser membuang syntax SQL yang mungkin saja benar akibat dari satu kesalahan penulisan keyword dan melempar banyak error karena menganggap syntax SQL tersebut salah semua, Hal ini jelas melanggar Konsep Panic Mode Error Recovery(Bab 6.3.1 Crafting Interpreters) .
+
+**Perbaikan.** Fungsi **synchronize** diberi sebuah **safe-point** agar parser dapat kembali membaca syntax SQL yang mungkin saja valid. **safe-point** ini berguna sebagai batas **synchronize** untuk membuang token yang rusak atau typo dan  **safe-point** dibagi menjadi dua yaitu ketika bertemu token semicolon **;** atau bertemu **keyword pembuka statement** seperti (select,insert,update,delete).
+
+**Test regresi.** test_lexer.py::test_synchronize_panic_mode.
+
+**Peran AI** AI digunakan untuk membuat tes dan menjelaskan konsep yang sesuai dengan buku dan spesifikasi
