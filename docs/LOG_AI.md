@@ -10,5 +10,7 @@ Catat setiap penggunaan AI atau coding agent yang memengaruhi kode atau laporan.
 | 4 | Zaky | buatkan test alias shadowing untuk di tambah di test_tambahan | diterima | Karena konsisten dengan pengecekan manual | Dibandingkan dengan pengecekan manual dan hasil test yang digenerate AI konsisten |
 | 5 | Farrel | Jelaskan mengenai fungsi-fungsi buatan pada resolver.py dan pandu saya dalam mengerjakan TODO(T2) | diterima | Karena kode untuk TODO (T2) membuat hasil test_kolom_tanpa_qualifier_satu_tabel pada test_resolver dari FAIL menjadi PASS | membandingkan hasil test |
 
-**Refleksi (3-5 kalimat).** Di bagian mana AI paling membantu? Di mana AI keliru atau
-menyesatkan, dan bagaimana kalian mengetahuinya?
+**Refleksi.** AI paling membantu kami dalam mencari bug dan membuat test untuk memastikan
+perbaikannya. Sejauh penggunaan kami, AI jarang memberikan hasil yang keliru karena spesifikasi
+dan konteks codebase yang dibutuhkan tersedia. Kami tetap memeriksa hasil AI, dan pada beberapa
+kasus kami yakin karena hasilnya konsisten dengan pengecekan manual atau hasil dari AI lain.

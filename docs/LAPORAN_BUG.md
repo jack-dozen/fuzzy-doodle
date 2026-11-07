@@ -1,36 +1,5 @@
 # Laporan Bug
 
-Salin blok di bawah untuk setiap bug. Bagian **Akar masalah** wajib ditulis dengan kata-kata
-sendiri dan memakai konsep dari *Crafting Interpreters* (sebutkan bab). Bagian ini diuji lisan.
-
----
-
-## Bug 1: (judul singkat)
-
-**Ditemukan oleh:** (nama) · **Diperbaiki oleh:** (nama)
-
-**Gejala.** Input, output yang didapat, dan output yang diharapkan menurut SPESIFIKASI.md
-(sebutkan bagiannya).
-
-**Reproduksi minimal.** SQL terpendek yang memicu bug:
-
-```sql
-
-```
-
-**Akar masalah.** Mengapa kode lama salah? Konsep apa yang dilanggar?
-
-**Perbaikan.** File dan fungsi yang diubah, serta alasannya. Sebutkan juga perbaikan
-alternatif yang kalian pertimbangkan dan alasan tidak memilihnya.
-
-**Test regresi.** Nama test di `tests/test_tambahan.py` yang gagal sebelum perbaikan dan lulus
-sesudahnya.
-
-**Peran AI.** Apakah AI membantu menemukan atau memperbaiki bug ini? Bagaimana kalian
-memverifikasinya?
-
----
-
 ## Bug 1: Case Insensitive pada Lexer
 
 **Ditemukan oleh:** Farrel . **Diperbaiki oleh:** Farrel
@@ -41,7 +10,7 @@ memverifikasinya?
 select id from t
 ```
 
-**Akar Permasalahan.** Kode lama salah karena Lexer tidak peka terhadap Token yang seharusnya diidentifikasi sebagai KEYWORD hanya karena huruf kecil dan huruf besar. Konsep yang dilanggar adalah Case sensitivity.
+**Akar Permasalahan.** Kode lama salah karena Lexer tidak peka terhadap Token yang seharusnya diidentifikasi sebagai KEYWORD hanya karena huruf kecil dan huruf besar. Konsep yang dilanggar adalah Case Sensitivity / Lexical Grammar (Pengenalan Keyword vs Identifier). Berdasarkan buku Crafting Interpreters, konsep ini dibahas pada Bab 4: Scanning (khususnya mengenai pembedaan antara keyword dan identifier pada Section 4.7 Reserved Words and Identifiers).
 
 **Perbaikan.** Fungsi **_word()** pada file **Lexer** dengan mengubah teks menjadi kapital dengan fungsi **.upper()** dan menyimpan nilainya pada variabel baru (misal upper_text) agar keaslian teks. upper_text inilah yang akan dicek apakah ada di KEYWORD atau tidak. Jika ada, maka masukan upper_text sebagai token KEYWORD. Jika tidak, maka masukan text sebagai token IDENT.
 
@@ -60,7 +29,7 @@ select id from t
 ```sql
 ```
 
-**Akar Permasalahan.** Kode lama salah karena ketika kutip pertama ditemukan dan menemukan kutip berikutnya padahal string belum selesai atau belum habis, lexer menganggap kutip tersebut sebagai penutup string sehingga menghasilkan string O dan string Brian.
+**Akar Permasalahan.** Kode lama salah karena ketika kutip pertama ditemukan dan menemukan kutip berikutnya padahal string belum selesai atau belum habis, lexer menganggap kutip tersebut sebagai penutup string sehingga menghasilkan string O dan string Brian. Konsep yang dilanggar adalah Lexical Grammar / String Literal Scanning. Berdasarkan buku Crafting Interpreters, hal ini terkait dengan aturan scanning string pada Bab 4: Scanning (Section 4.6.1 String literals).
 
 **Perbaikan.** mengecek apakah karakter yang dibaca selanjutnya setelah "'" (kutip seletlah kutip pembuka string) merupakan karakter kutip " ' " lagi dengan menggunakan **match()**. Jika **true**, maka kedua kutip tersebut akan dijadikan satu kutip dan dimasukan kedalam string. Jika **false** maka akan break yang menandai bahwa kutip saat itu adalah kutip penutup string.
 
@@ -82,7 +51,7 @@ select id from t
 WHERE o.status = 'LUNAS' AND o.catatan <> 'FROM rahasia'
 ```
 
-**Akar masalah.** Dalam kode lama tidak diterapkan pengecekan jika karakter sesudah "<" adalah ">", yang dilakukan hanya pengecekan untuk "<=".
+**Akar masalah.** Dalam kode lama tidak diterapkan pengecekan jika karakter sesudah "<" adalah ">", yang dilakukan hanya pengecekan untuk "<=". Konsep yang dilanggar adalah Two-Character Operators / Lookahead pada Scanner. Berdasarkan buku Crafting Interpreters, scanner memerlukan mekanisme lookahead untuk mengenali operator yang terdiri dari satu atau dua karakter pada Bab 4: Scanning (Section 4.5.2 Operators dan Section 4.6).
 
 **Perbaikan.** Perubahan dilakukan di file lexer.py di dalam fungsi _scan_token karena bagian itu yang bertugas untuk 'memaknai' token, tidak menemukan perbaikan alternatif.
 
@@ -105,7 +74,7 @@ UPDATE pelanggan SET level = 'gold'
 WHERE id IN (SELECT pelanggan_id FROM pesanan WHERE total > 1000000);
 ```
 
-**Akar masalah.** Dalam kode lama subquery menghasilkan U, ini melanggar ketentuan di SPESIFIKASI.md bagian 5.
+**Akar masalah.** Dalam kode lama subquery menghasilkan U, ini melanggar ketentuan di SPESIFIKASI.md bagian 5. Konsep yang dilanggar adalah Semantic Analysis / Intermediate Representation / AST Node Classification. Berdasarkan buku Crafting Interpreters, hal ini dibahas pada Bab 2: A Map of the Territory (Section 2.1.3 Static analysis dan Section 2.1.4 Intermediate representations) serta Bab 5: Representing Code.
 
 **Perbaikan.** File yang diubah analyzer.py dalam fungsi analyze_statement,
 
@@ -128,7 +97,7 @@ LEFT OUTER JOIN b
 ON b.a_id = a.id
 ```
 
-**Akar Permasalahan.** Kode lama salah karena pada saat kata LEFT ditemukan oleh **match_kw()**, tidak dilakukan pemeriksaan tambahan apakah ada kata OUTER dan langsung mengharapkan kata selanjutnya adalah JOIN sehingga terjadi parserror.
+**Akar Permasalahan.** Kode lama salah karena pada saat kata LEFT ditemukan oleh **match_kw()**, tidak dilakukan pemeriksaan tambahan apakah ada kata OUTER dan langsung mengharapkan kata selanjutnya adalah JOIN sehingga terjadi parserror. Konsep yang dilanggar adalah Context-Free Grammar / Optional Production Rules. Berdasarkan buku Crafting Interpreters, hal ini dipelajari pada Bab 5: Representing Code (Section 5.1.2 Enhancing our notation) dan Bab 6: Parsing Expressions.
 
 **Perbaikan.** Setelah menemukan kata LEFT, dilakukan pengecekan kata selanjutnya ada OUTER atau tidak dengan menggunakan **match_kw()**. Jika tidak, maka akan mengembalikan none dan tidak akan menggeser pointer. Jika ada, maka akan mengembalikan OUTER dan memindahkan pointer.
 
@@ -150,7 +119,7 @@ FROM t
 WHERE status = 'ACTIVE' OR gaji > 5000 AND umur >= 21;
 ```
 
-**Akar Permasalahan.** Kode lama salah karena parser mencampur tingkatan OR dan AND pada satu fungsi yaitu **_logical** sehingga hasil dari ASTnya AND sebagai root padahal seharusnya OR sebagai presedensi terendah adalah ROOTnya bukan AND yang berada satu tingkat lebih tinggi dari OR. ini melanggar konsep stratified grammar pada crafting interpreters, dimana setiap level presedensi sebaiknya dibuat aturan berbeda untuk tiap level. Penerapan pada parser ini adalah dengan membuat dua fungsi berbeda yaitu **or_expr** dan **and_expr**.
+**Akar Permasalahan.** Kode lama salah karena parser mencampur tingkatan OR dan AND pada satu fungsi yaitu **_logical** sehingga hasil dari ASTnya AND sebagai root padahal seharusnya OR sebagai presedensi terendah adalah ROOTnya bukan AND yang berada satu tingkat lebih tinggi dari OR. Ini melanggar konsep Stratified Grammar dan Operator Precedence (Precedence and Associativity) dari buku Crafting Interpreters, di mana setiap level presedensi harus dibuat aturan tata bahasa (grammar) yang terpisah untuk mencegah ambiguitas, yang dibahas pada Bab 6: Parsing Expressions (Section 6.1 Ambiguity and the Parsing Game).
 
 **Perbaikan.** menghapus fungsi **logical()** dan memecahnya menjadi dua fungsi berbeda yaitu **or_expr** dan **and_expr**. fungsi **expr** diubah dari mengembalikan fungsi **logical()** menjadi mengembalikan **or_expr**.
 
@@ -173,7 +142,7 @@ FROM pelanggan x
 WHERE x.id IN (SELECT x.pelanggan_id FROM pesanan x WHERE x.total > 500000);
 ```
 
-**Akar masalah.** Dalam kode lama, dilakukan reverse pada scope, padahal _lookup mengumpulkan scope dari dalam ke luar, sehingga tidak perlu di reverse.
+**Akar masalah.** Dalam kode lama, dilakukan reverse pada scope, padahal _lookup mengumpulkan scope dari dalam ke luar, sehingga tidak perlu di reverse. Konsep yang dilanggar adalah Lexical Scope and Shadowing. Berdasarkan buku Crafting Interpreters, aturan pencarian nama dari scope terdalam ke scope luar (nesting and shadowing) dibahas secara mendalam pada Bab 8: Statements and State (Section 8.5 Scope, nesting, and shadowing).
 
 **Perbaikan.** File resolver.py di dalam fungsi _lookup(), menghapus reverse(scope) menjadi scope saja.
 
